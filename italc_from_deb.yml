@@ -30,7 +30,7 @@
 
 #  - name: Authorized keys
 #    authorized_key: user=root
-#                    key={{ lookup('file', '.ssh/italc_dsa_key.pub') }}
+#                    key={{ lookup('file', 'ssh/id_rsa.pub') }}
 #                    state=present
 #    tags:
 #      - ssh
@@ -46,7 +46,7 @@
 #      - chgrp -R italc /etc/italc/keys/private/
 
   - name: Copy private key for teacher
-    copy: src=.ssh/italc_dsa_key
+    copy: src=dsa_keys/italc_dsa_key
           dest=/etc/italc/keys/private/teacher/key
           owner=pi
           group=pi
@@ -55,7 +55,7 @@
       - ssh
 
   - name: Copy public key for teacher
-    copy: src=.ssh/italc_dsa_key.pub
+    copy: src=dsa_keys/italc_dsa_key.pub
           dest=/etc/italc/keys/public/teacher/italc_dsa_key.pub
           owner=pi
           group=pi
@@ -112,13 +112,13 @@
 
 #  - name: Authorized keys
 #    authorized_key: user=root
-#                    key={{ lookup('file', '.ssh/italc_dsa_key.pub') }}
+#                    key={{ lookup('file', 'ssh/id_rsa.pub') }}
 #                    state=present
 #    tags:
 #      - ssh
 
   - name: Copy ssh keys
-    copy: src=.ssh/italc_dsa_key.pub
+    copy: src=dsa_keys/italc_dsa_key.pub
           dest=/etc/italc/keys/public/
           owner=root
           group=root
