@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# require_relative './.vagrant/key_authorization.rb'
+require_relative './.vagrant/key_authorization.rb'
 
 VAGRANTFILE_API_VERSION = "2"
 
@@ -13,9 +13,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.memory = "1024"
   end
 
-  # config.vm.provision "shell", inline: "mkdir -p /root/.ssh"
+  config.vm.provision "shell", inline: "mkdir -p /root/.ssh"
 
-  # authorize_key_for_root config, '~/.ssh/id_dsa.pub', '~/.ssh/id_rsa.pub'
+  authorize_key_for_root config, 'fles/ssh/id_dsa.pub', 'files/ssh/id_rsa.pub'
+
+  config.vm.provision "shell", inline: "apt-get update"
+  config.vm.provision "shell", inline: "useradd -m -p raspberry -s /bin/bash -U -G users,sudo pi"
 
   {
     'master-vm'   => '192.168.33.11',
