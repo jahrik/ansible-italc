@@ -1,0 +1,77 @@
+---
+- hosts: all
+  become: true
+  become_method: sudo
+  tasks:
+
+  - name: Install all required packages
+    package: name={{item}} state=present
+    with_items:
+      - gcc
+      - g++
+      - cmake
+      - make
+      - python
+      - python-software-properties
+      - software-properties-common
+      - libqt4-dev
+      - qt4-dev-tools
+      - qtbase5-dev
+      - qtbase5-dev-tools
+      - xorg-dev
+      - libxtst-dev
+      - libjpeg-dev
+      - zlib1g-dev
+      - libssl-dev
+      - libpam0g-dev
+      - qttools5-dev
+      - qttools5-dev-tools
+    tags:
+      - package
+
+  - name: Clone iTalc from GitHub
+    git:
+      repo=https://github.com/iTALC/italc.git
+      dest=/opt/italc
+      version=v2.0.2
+
+# cmake CMakeLists.txt
+# make
+# make install
+# ldconfig
+# italc
+
+#  - name: Add iTalc repo
+#    apt_repository: 
+#    ppa:ubuntuhandbook1/apps
+#      repo='deb http://archive.canonical.com/ubuntu hardy partner'
+#      state=present
+#    tags:
+#      - package
+#
+#  - name: Add iTalc repo
+#    get_url: url="http://public-repo-1.hortonworks.com/ambari/centos6/2.x/updates/2.2.1.0/ambari.repo" dest=/etc/yum.repos.d/ambari.repo
+#  
+#  - name: Import Ambari Repo GPG key
+#    rpm_key:
+#      key: http://public-repo-1.hortonworks.com/ambari/centos6/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins
+#      state: present
+#
+#  - name: Authorized keys
+#    authorized_key: user=root
+#                    key={{ lookup('file', '.ssh/id_rsa.pub') }}
+#                    state=present
+#    tags:
+#      - ssh
+#
+#  - name: Copy ssh keys
+#    copy: src={{item}}
+#          dest=/root/.ssh/
+#          owner=root
+#          group=root
+#          mode=0600
+#    with_items:
+#      - .ssh/id_rsa
+#      - .ssh/id_rsa.pub
+#    tags:
+#      - ssh
