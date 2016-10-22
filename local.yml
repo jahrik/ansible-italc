@@ -1,0 +1,114 @@
+---
+######################
+# Master Configuration
+######################
+- hosts: master
+  become: true
+  become_method: sudo
+  tasks:
+
+  - name: Install all required packages
+    package: name={{item}} state=present
+    with_items:
+      - libqt4-dev
+      - qt4-dev-tools
+      - xorg-dev
+      - libxtst-dev
+      - libjpeg-dev
+      - zlib1g-dev
+      - libssl-dev
+      - libpam0g-dev
+      - vim
+      - libitalc 
+      - italc-master
+      - x11vnc
+    tags:
+      - package
+
+#  - name: Authorized keys
+#    authorized_key: user=root
+#                    key={{ lookup('file', 'files/ssh/id_rsa.pub') }}
+#                    state=present
+#    tags:
+#      - ssh
+
+  - name: Copy private key for teacher
+    copy: src=files/dsa_keys/italc_dsa_key
+          dest=/etc/italc/keys/private/teacher/key
+          owner=pi
+          group=pi
+          mode=0600
+    tags:
+      - ssh
+
+  - name: Copy public key for teacher
+    copy: src=files/dsa_keys/italc_dsa_key.pub
+          dest=/etc/italc/keys/public/teacher/italc_dsa_key.pub
+          owner=pi
+          group=pi
+          mode=0600
+    tags:
+      - ssh
+
+  - name: Create ica service
+    copy: src=files/init.d/ica
+          dest=/etc/init.d/ica
+          owner=root
+          group=root
+          mode=0755
+    tags:
+      - service
+
+  - name: Systemctl daemon-reload
+    command: systemctl daemon-reload
+    tags:
+      - service
+
+  - name: Start ica Service
+    service: name=ica
+             enabled=yes
+             state=started
+    tags:
+      - service
+
+######################
+# Client configuration
+######################
+- hosts: clients
+  become: true
+  become_method: sudo
+  tasks:
+
+  - name: Install all required packages
+    package: name={{item}} state=present
+    with_items:
+      - libqt4-dev
+      - qt4-dev-tools
+      - xorg-dev
+      - libxtst-dev
+      - libjpeg-dev
+      - zlib1g-dev
+      - libssl-dev
+      - libpam0g-dev
+      - vim
+      - libitalc 
+      - italc-client
+      - x11vnc
+    tags:
+      - package
+
+#  - name: Authorized keys
+#    authorized_key: user=root
+#                    key={{ lookup('file', 'files/ssh/id_rsa.pub') }}
+#                    state=present
+#    tags:
+#      - ssh
+
+  - name: Copy ssh keys
+    copy: src=files/dsa_keys/italc_dsa_key.pub
+          dest=/etc/italc/keys/public/
+          owner=root
+          group=root
+          mode=0600
+    tags:
+     - ssh
