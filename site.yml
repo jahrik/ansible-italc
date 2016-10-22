@@ -25,6 +25,21 @@
     tags:
       - package
 
+# Install from source
+#  - name: Clone iTalc from GitHub
+#    git:
+#      repo=https://github.com/iTALC/italc.git
+#      dest=/opt/italc
+#      version=v2.0.2
+
+#  - name: Make
+#    command: "{{item}}"
+#    with_items:
+#      - cmake CMakeLists.txt
+#      - make
+#      - make install
+#      - ldconfig
+
 #  - name: Generate new keys
 #    command: imc -role teacher -createkeypair
 
