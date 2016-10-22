@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-require_relative './.vagrant/key_authorization.rb'
+require_relative './files/key_authorization.rb'
 
 VAGRANTFILE_API_VERSION = '2'.freeze
 
@@ -21,8 +21,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # config.vm.provision 'shell', inline: "mkdir /etc/ansible && cat 'localhost ansible_connection=local' > /etc/ansible/hosts"
 
   config.vm.provision 'ansible' do |ansible|
-    ansible.limit = "all"
-    ansible.inventory_path = './inventory.ini'
+    ansible.limit = 'all'
+    ansible.inventory_path = './vagrant.ini'
     ansible.raw_arguments  = [
     "--private-key=/files/ssh/id_rsa"
     ]

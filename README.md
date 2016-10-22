@@ -72,3 +72,8 @@ ssh-add
 ssh master-vm.dev
 ssh client-vm.dev
 ```
+
+After adding ssh keys to ssh-agent you can run ansible normally.
+```
+ansible-playbook -i vagrant.ini site.yml
+```

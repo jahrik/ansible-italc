@@ -32,6 +32,13 @@
 #    tags:
 #      - ssh
 
+  - name: Create teacher directory
+    file: path={{item}}
+          state=directory
+    with_items:
+      - /etc/italc/keys/private/teacher
+      - /etc/italc/keys/public/teacher
+
   - name: Copy private key for teacher
     copy: src=files/dsa_keys/italc_dsa_key
           dest=/etc/italc/keys/private/teacher/key
@@ -56,11 +63,13 @@
           owner=root
           group=root
           mode=0755
+    register: ica
     tags:
       - service
 
   - name: Systemctl daemon-reload
     command: systemctl daemon-reload
+    when: ica.changed
     tags:
       - service
 
