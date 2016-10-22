@@ -6,7 +6,6 @@
 apt-get install ansible
 ```
 
-
 ## Create keys in the files/dsa_keys directory
 
 ```
@@ -22,25 +21,20 @@ ex:
 
 [clients]
 192.168.11.146 ansible_user=pi
-#192.168.1.101 ansible_user=tom
-#192.168.1.102 ansible_user=tom
-#192.168.1.103 ansible_user=tom
+
+[vagrant]
+#192.168.33.11 ansible_user=tom
+#192.168.33.12 ansible_user=tom
 ```
 
+## Run ansible
 
-## Run ansible against all servers
-
-Install from deb package
 ```
-ansible-playbook italc_from_deb.yml
-```
-
-Install from source package off github (v2)
-```
-ansible-playbook italc_from_source.yml
+ansible-playbook site.yml 
+ansible-playbook -l master site.yml 
+ansible-playbook -l clients site.yml 
 ```
 
-Only run --tags ssh (because you just updated the dsa keys)
+Update ssh keys and nothing else
 ```
-ansible-playbook italc_from_deb.yml --tags dsa
-```
+ansible-playbook site.yml --tags ssh

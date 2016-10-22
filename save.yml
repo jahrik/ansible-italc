@@ -1,0 +1,35 @@
+
+# Install from source
+#  - name: Clone iTalc from GitHub
+#    git:
+#      repo=https://github.com/iTALC/italc.git
+#      dest=/opt/italc
+#      version=v2.0.2
+
+#  - name: Make
+#    command: "{{item}}"
+#    with_items:
+#      - cmake CMakeLists.txt
+#      - make
+#      - make install
+#      - ldconfig
+
+#  - name: Generate new keys
+#    command: imc -role teacher -createkeypair
+
+#  - name: Authorized keys
+#    authorized_key: user=root
+#                    key={{ lookup('file', 'files/ssh/id_rsa.pub') }}
+#                    state=present
+#    tags:
+#      - ssh
+
+#  - name: Add italc group
+#    group: name=italc
+#           state=present
+#
+#  - name: Add pi to group italc
+#    command: "{{item}}"
+#    with_items:
+#      - adduser pi italc
+#      - chgrp -R italc /etc/italc/keys/private/
