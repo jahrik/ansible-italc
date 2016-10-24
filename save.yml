@@ -1,3 +1,12 @@
+#  - name: Append /etc/hosts file
+#    lineinfile: dest=/etc/hosts
+#                regexp=".*^{{ hostvars[item].ansible_host }}"
+#                line="{{ hostvars[item].ansible_host }} {{ hostvars[item].ansible_fqdn }} {{ hostvars[item].ansible_hostname }}"
+#                  state=present
+#    when: hostvars[item].ansible_host is defined
+#    with_items: "{{ groups['all'] }}"
+#    tags:
+#      - setup
 
 # Install from source
 #  - name: Clone iTalc from GitHub

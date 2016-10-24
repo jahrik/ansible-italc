@@ -1,11 +1,41 @@
 ---
-######################
-# Master Configuration
-######################
+#########
+# Setup #
+#########
+- hosts: all
+  become: true
+  become_method: sudo
+  vars:
+    user: "{{ ansible_user }}"
+  tasks:
+
+  - name: Allow {{ user }} to have passwordless sudo
+    lineinfile: "dest=/etc/sudoers state=present regexp='^{{ user }}' line='{{ user }} ALL=(ALL) NOPASSWD: ALL'"
+    tags:
+      - setup
+
+  - name: Authorized keys
+    authorized_key: user={{ user }}
+                    key={{ lookup('file', 'files/ssh/id_rsa.pub') }}
+                    state=present
+    tags:
+      - setup
+
+##############################
+# Linux Master Configuration #
+##############################
 - hosts: master
   become: true
   become_method: sudo
+  vars:
+    user: pi
   tasks:
+
+  - name: If debian or ubuntu, apt-get update
+    apt: update_cache=yes
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    tags:
+      - package
 
   - name: Install all required packages
     package: name={{item}} state=present
@@ -22,40 +52,55 @@
       - libitalc 
       - italc-master
       - x11vnc
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
     tags:
       - package
 
-#  - name: Authorized keys
-#    authorized_key: user=root
-#                    key={{ lookup('file', 'files/ssh/id_rsa.pub') }}
-#                    state=present
-#    tags:
-#      - ssh
-
-  - name: Create teacher directory
+  - name: Create teacher key directories
     file: path={{item}}
           state=directory
     with_items:
       - /etc/italc/keys/private/teacher
       - /etc/italc/keys/public/teacher
+    tags:
+      - ssh
 
   - name: Copy private key for teacher
     copy: src=files/dsa_keys/italc_dsa_key
           dest=/etc/italc/keys/private/teacher/key
-          owner=pi
-          group=pi
+          owner={{ user }}
+          group={{ user }}
           mode=0600
     tags:
       - ssh
 
   - name: Copy public key for teacher
     copy: src=files/dsa_keys/italc_dsa_key.pub
-          dest=/etc/italc/keys/public/teacher/italc_dsa_key.pub
-          owner=pi
-          group=pi
+          dest=/etc/italc/keys/public/teacher/key
+          owner={{ user }}
+          group={{ user }}
           mode=0600
     tags:
       - ssh
+
+  - name: Create .italc config directories
+    file: path={{item}}
+          state=directory
+          owner={{ user }}
+          group={{ user }}
+    with_items:
+      - /home/{{ user }}/.italc
+    tags:
+      - config
+
+  - name: Generate GlobalConfig.xml
+    template: src=templates/GlobalConfig.xml.j2
+              dest=/home/{{ user }}/.italc/GlobalConfig.xml
+              owner={{ user }}
+              group={{ user }}
+              mode=0600
+    tags:
+      - config
 
   - name: Create ica service
     copy: src=files/init.d/ica
@@ -67,25 +112,29 @@
     tags:
       - service
 
-  - name: Systemctl daemon-reload
+  - name: Reload daemons
     command: systemctl daemon-reload
-    when: ica.changed
+    when:
+      - ica.changed
+      - ansible_distribution == 'Debian'
     tags:
       - service
 
-  - name: Start ica Service
+  - name: Start and enable ica Service
     service: name=ica
              enabled=yes
              state=started
     tags:
       - service
 
-######################
-# Client configuration
-######################
+##############################
+# Linux Client Configuration #
+##############################
 - hosts: clients
   become: true
   become_method: sudo
+  vars:
+    user: pi
   tasks:
 
   - name: Install all required packages
@@ -103,21 +152,58 @@
       - libitalc 
       - italc-client
       - x11vnc
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
     tags:
       - package
 
-#  - name: Authorized keys
-#    authorized_key: user=root
-#                    key={{ lookup('file', 'files/ssh/id_rsa.pub') }}
-#                    state=present
-#    tags:
-#      - ssh
+  - name: Create client key directories
+    file: path={{item}}
+          state=directory
+    with_items:
+      - /etc/italc/keys/public/none
+      - /etc/italc/keys/public/teacher
+    tags:
+      - ssh
 
-  - name: Copy ssh keys
+  - name: Copy ssh key for client
     copy: src=files/dsa_keys/italc_dsa_key.pub
-          dest=/etc/italc/keys/public/
-          owner=root
-          group=root
+          dest=/etc/italc/keys/public/none/key
+          owner={{ user }}
+          group={{ user }}
           mode=0600
     tags:
      - ssh
+
+  - name: Copy ssh key for client
+    copy: src=files/dsa_keys/italc_dsa_key.pub
+          dest=/etc/italc/keys/public/teacher/key
+          owner={{ user }}
+          group={{ user }}
+          mode=0600
+    tags:
+     - ssh
+
+  - name: Create ica service
+    copy: src=files/init.d/ica
+          dest=/etc/init.d/ica
+          owner=root
+          group=root
+          mode=0755
+    register: ica
+    tags:
+      - service
+
+  - name: Reload daemons
+    command: systemctl daemon-reload
+    when:
+      - ica.changed
+      - ansible_distribution == 'Debian'
+    tags:
+      - service
+
+  - name: Start and enable ica Service
+    service: name=ica
+             enabled=yes
+             state=started
+    tags:
+      - service

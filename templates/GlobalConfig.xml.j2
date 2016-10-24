@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE italc-config-file>
+<globalclientconfig version="2.0.2">
+  <body>
+    <classroom name="Classroom">
+{% for host in groups['clients'] %}
+{% if hostvars[host]['ansible_eth1'] is defined %}
+        <client hostname="{{ hostvars[host]['ansible_eth1']['ipv4']['address'] }}" mac="{{ hostvars[host]['ansible_eth1']['macaddress'] }}" type="0" id="{{ range(100000, 999999) | random }}" name="{{ hostvars[host]['ansible_hostname'] }}"/>
+{% elif hostvars[host]['ansible_eth0']['active'] == true %}
+        <client hostname="{{ hostvars[host]['ansible_eth0']['ipv4']['address'] }}" mac="{{ hostvars[host]['ansible_eth0']['macaddress'] }}" type="0" id="{{ range(100000, 999999) | random }}" name="{{ hostvars[host]['ansible_hostname'] }}"/>
+{% elif hostvars[host]['ansible_wlan0']['active'] == true %}
+        <client hostname="{{ hostvars[host]['ansible_wlan0']['ipv4']['address'] }}" mac="{{ hostvars[host]['ansible_wlan0']['macaddress'] }}" type="0" id="{{ range(100000, 999999) | random }}" name="{{ hostvars[host]['ansible_hostname'] }}"/>
+{% else %}
+        <client hostname="{{ hostvars[host]['ansible_default_ipv4']['address'] }}" mac="{{ hostvars[host]['ansible_default_ipv4']['macaddress'] }}" type="0" id="{{ range(100000, 999999) | random }}" name="{{ hostvars[host]['ansible_hostname'] }}"/>
+{% endif %}
+{% endfor %}
+    </classroom>
+  </body>
+</globalclientconfig>
