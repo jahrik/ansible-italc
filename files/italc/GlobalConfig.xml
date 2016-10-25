@@ -4,7 +4,6 @@
   <body>
     <classroom name="Pi">
       <client hostname="localhost" mac="08:86:3b:02:12:63" type="1" id="881001" name="pi_test"/>
-      <client hostname="192.168.11.243" mac="08:00:27:54:d9:25" type="0" id="413541" name="client-01.dev"/>
     </classroom>
   </body>
 </globalclientconfig>
