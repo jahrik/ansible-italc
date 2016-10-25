@@ -17,8 +17,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   authorize_key_for_root config, '~/.ssh/id_dsa.pub', 'files/ssh/id_rsa.pub'
 
   config.vm.provision 'shell', inline: 'apt-get update'
-  config.vm.provision 'shell', inline: 'id -u pi &>/dev/null || useradd -m -p raspberry -s /bin/bash -U -G users,sudo pi'
-  config.vm.provision 'shell', inline: 'apt-get install xfce4 -y'
+  config.vm.provision 'shell', inline: 'id -u pi &>/dev/null || useradd -m -s /bin/bash -p raspberry -U -G users,sudo pi'
+  config.vm.provision 'shell', inline: 'apt-get install xfce4 lightdm -y'
   # config.vm.provision 'shell', inline: "mkdir /etc/ansible && cat 'localhost ansible_connection=local' > /etc/ansible/hosts"
 
 #  config.vm.provision 'ansible' do |ansible|
@@ -31,16 +31,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 #  end
 
   {
-    'debian-01'   => '192.168.33.11',
-    'debian-02'   => '192.168.33.12',
+    'debian-01'   => '192.168.1.11',
+    #'debian-02'   => '192.168.33.12',
   }.each do |short_name, ip|
     config.vm.define short_name do |host|
       host.vm.hostname = "#{short_name}.dev"
-      host.vm.network "public_network", bridge: "wlp3s0"
-      # host.vm.network "public_network", auto_config: false
-      # host.vm.provision "shell",
-        # run: "always",
-        # inline: "ifconfig eth1 #{ip} netmask 255.255.255.0 up"
+      # host.vm.network "public_network", bridge: "wlp3s0"
+      host.vm.network "public_network", bridge: "wlp3s0", auto_config: false
+      host.vm.provision "shell",
+        run: "always",
+        inline: "ifconfig eth1 #{ip} netmask 255.255.255.0 up"
       # host.vm.network 'private_network', ip: ip
     end
   end

@@ -28,7 +28,7 @@
   become: true
   become_method: sudo
   vars:
-    user: pi
+    user: "{{ ansible_user }}"
   tasks:
 
   - name: If debian or ubuntu, apt-get update
@@ -38,7 +38,8 @@
       - package
 
   - name: Install all required packages
-    package: name={{item}} state=present
+    package: name={{item}}
+             state=present
     with_items:
       - libqt4-dev
       - qt4-dev-tools
@@ -93,15 +94,6 @@
     tags:
       - config
 
-  - name: Generate GlobalConfig.xml
-    template: src=templates/GlobalConfig.xml.j2
-              dest=/home/{{ user }}/.italc/GlobalConfig.xml
-              owner={{ user }}
-              group={{ user }}
-              mode=0600
-    tags:
-      - config
-
   - name: Create ica service
     copy: src=files/init.d/ica
           dest=/etc/init.d/ica
@@ -120,12 +112,66 @@
     tags:
       - service
 
+  - name: Check if ica is running (IGNORE ERRORS)
+    shell: /etc/init.d/ica status
+    ignore_errors: yes
+    changed_when: true
+    register: service_ica_status
+    tags:
+      - config
+
+  - name: Stop iTalc (IGNORE ERRORS)
+    shell: killall italc
+    ignore_errors: yes
+    when: service_ica_status | success
+    tags:
+      - config
+
+  - name: Stop ica Service
+    service: name=ica
+             state=stopped
+    when: service_ica_status | success
+    tags:
+      - config
+
+  - name: Generate GlobalConfig.xml
+    template: src=templates/GlobalConfig.xml.j2
+              dest=/home/{{ user }}/.italc/GlobalConfig.xml
+              owner={{ user }}
+              group={{ user }}
+              mode=0600
+    register: config
+    tags:
+      - config
+
+  - name: Remove GlobalConfig.xml.bak file if config changes were made
+    file: path=/home/{{ user }}/.italc/GlobalConfig.xml.bak
+          state=absent
+    when:
+      - config.changed
+    tags:
+      - config
+
   - name: Start and enable ica Service
     service: name=ica
              enabled=yes
              state=started
     tags:
       - service
+
+  - name: Start iTalc (IGNORE ERRORS)
+    become: false
+    ignore_errors: yes
+    shell: nohup /usr/bin/italc &
+    args:
+      executable: /bin/bash
+    environment:
+      XAUTHORITY: /home/{{ user }}/.Xauthority
+      DISPLAY: ':0'
+    poll: 0
+    tags:
+      - service
+      - italc
 
 ##############################
 # Linux Client Configuration #
@@ -134,11 +180,18 @@
   become: true
   become_method: sudo
   vars:
-    user: pi
+    user: "{{ ansible_user }}"
   tasks:
 
+  - name: If debian or ubuntu, apt-get update
+    apt: update_cache=yes
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    tags:
+      - package
+
   - name: Install all required packages
-    package: name={{item}} state=present
+    package: name={{item}} 
+             state=present
     with_items:
       - libqt4-dev
       - qt4-dev-tools
@@ -207,3 +260,20 @@
              state=started
     tags:
       - service
+
+#  - name: Restart iTalc Client (IGNORE ERRORS)
+#    become: false
+#    ignore_errors: yes
+#    shell: "{{item}}"
+#    args:
+#      executable: /bin/bash
+#    environment:
+#      XAUTHORITY: /home/{{ user }}/.Xauthority
+#      DISPLAY: ':0'
+#    poll: 0
+#    with_items:
+#      - "ps waux | grep italc | awk '{ print $2 }' | xargs kill -9"
+#      - nohup /usr/lib/italc/ica &
+#    tags:
+#      - service
+#      - italc
