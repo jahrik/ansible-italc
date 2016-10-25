@@ -2,3 +2,4 @@ files/ssh/*
 files/dsa_keys/*
 .vagrant
 *.swp
+inventory.ini
