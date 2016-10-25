@@ -2,11 +2,18 @@
 
 ### Install ansible
 
+Debian
 ```
-apt-get install ansible
+sudo apt-get install ansible
 ```
 
-### Create keys in the files/dsa_keys directory
+Alternatively you can install ansible using pip.
+```
+sudo apt-get intsall python-pip
+sudo pip install ansible
+```
+
+### Create keys in the files/dsa_keys directory for italc to use
 
 ```
 ssh-keygen -t dsa -f files/dsa_keys/italc_dsa_key
@@ -35,9 +42,14 @@ ansible-playbook -l clients site.yml
 
 ## Tags
 
+### Run setup to add your user's ssh key to authorized hosts and enable passwordless sudo
+```
+ansible-playbook site.yml --tags setup
+```
+
 ### Only install packages
 ```
-ansible-playbook site.yml --tags packages
+ansible-playbook site.yml --tags package
 ```
 
 ### Update ssh keys and nothing else
