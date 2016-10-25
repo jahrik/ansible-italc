@@ -1,7 +1,19 @@
 [master]
-pi ansible_host=192.168.1.136 ansible_user=pi
+pi ansible_host=192.168.1.100 ansible_user=pi
+
+[debian]
+debian-01 ansible_host=192.168.1.101 ansible_user=user
+debian-02 ansible_host=192.168.1.102 ansible_user=user
+
+[ubuntu]
+ubuntu-01 ansible_host=192.168.1.103 ansible_user=ubuntu
+ubuntu-02 ansible_host=192.168.1.104 ansible_user=ubuntu
+
+[windows]
+windows-01 ansible_host=192.168.1.105 ansible_user=windows
+windows-02 ansible_host=192.168.1.106 ansible_user=windows
 
 [clients]
-#pi ansible_host=192.168.1.136 ansible_user=pi
-debian-01 ansible_host=192.168.1.11 ansible_user=pi
-#debian-02 ansible_host=192.168.11.235 ansible_user=pi
+debian
+ubuntu
+windows
