@@ -1,5 +1,20 @@
 # iTalc installation with ansible
 
+(github.com/iTALC/italc)[https://github.com/iTALC/italc]
+
+(italc.sourceforge.net)[http://italc.sourceforge.net/]
+
+### iTalc
+
+iTalc is commonly used in schools allowing a teacher to control student's computers.
+
+iTalc is a tool for controlling other computers in several ways:
+- Remote desktop (vnc, rdp)
+- Share teacher's desktop to show demos
+- Lock student's computers
+- Send text messages
+- Powering on and off remote computers
+
 ### Install ansible
 
 Debian
