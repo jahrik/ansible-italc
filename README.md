@@ -1,8 +1,8 @@
 # iTalc installation with ansible
 
-(github.com/iTALC/italc)[https://github.com/iTALC/italc]
+[github.com/iTALC/italc](https://github.com/iTALC/italc)
 
-(italc.sourceforge.net)[http://italc.sourceforge.net/]
+[italc.sourceforge.net](http://italc.sourceforge.net/)
 
 ### iTalc
 
