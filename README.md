@@ -1,10 +1,10 @@
 # iTalc installation with ansible
 
+### iTalc
+
 [github.com/iTALC/italc](https://github.com/iTALC/italc)
 
 [italc.sourceforge.net](http://italc.sourceforge.net/)
-
-### iTalc
 
 iTalc is commonly used in schools allowing a teacher to control student's computers.
 
